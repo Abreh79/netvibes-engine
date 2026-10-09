@@ -33,19 +33,21 @@ def render_final_attributed_clip(input_vertical_mp4: str, srt_path: str, cta_tex
     """
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     
-    # Escape path for ffmpeg subtitles filter
-    escaped_srt = srt_path.replace(":", "\\:").replace("'", "\\'")
-    
-    subtitles_filter = (
-        f"subtitles='{escaped_srt}':force_style='FontSize=18,PrimaryColour=&H00FFFFFF&,"
-        f"OutlineColour=&H00000000&,BorderStyle=3,Outline=2,Alignment=2,MarginV=250'"
-    )
     cta_filter = (
         f"drawbox=y=ih-160:color=black@0.65:width=iw:height=100:t=fill,"
         f"drawtext=text='{cta_text}':fontcolor=white:fontsize=36:x=(w-text_w)/2:y=h-125"
     )
 
-    combined_filter = f"{subtitles_filter},{cta_filter}"
+    has_subtitles = os.path.exists(srt_path) and os.path.getsize(srt_path) > 0
+    if has_subtitles:
+        escaped_srt = srt_path.replace(":", "\\:").replace("'", "\\'")
+        subtitles_filter = (
+            f"subtitles='{escaped_srt}':force_style='FontSize=18,PrimaryColour=&H00FFFFFF&,"
+            f"OutlineColour=&H00000000&,BorderStyle=3,Outline=2,Alignment=2,MarginV=250'"
+        )
+        combined_filter = f"{subtitles_filter},{cta_filter}"
+    else:
+        combined_filter = cta_filter
 
     cmd = [
         "ffmpeg", "-y",
@@ -54,7 +56,6 @@ def render_final_attributed_clip(input_vertical_mp4: str, srt_path: str, cta_tex
         "-c:v", "libx264",
         "-preset", "veryfast",
         "-crf", "20",
-        "-c:a", "copy",
         output_path
     ]
 

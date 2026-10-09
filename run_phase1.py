@@ -29,8 +29,8 @@ def run_pipeline(audio_path: str = None, transcript_path: str = None):
         }
         save_transcript(transcript, os.path.join(output_dir, "sample_transcript.json"))
 
-    print("Extracting high-performing hook candidates...")
-    hooks = score_and_extract_hooks(transcript, min_sec=30.0, max_sec=60.0)
+    print("Extracting dual-stream (Dialogue + Action) hook candidates...")
+    hooks = score_and_extract_hooks(transcript, video_path=audio_path or "", min_sec=30.0, max_sec=60.0)
     
     hooks_file = os.path.join(output_dir, "candidate_hooks.json")
     with open(hooks_file, "w") as f:
