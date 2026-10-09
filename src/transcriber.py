@@ -18,7 +18,17 @@ def extract_filtered_audio(video_audio_path: str, output_wav: str = "/tmp/filter
         "-af", "highpass=f=200,lowpass=f=3000",
         output_wav
     ]
-    subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    try:
+        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    except subprocess.CalledProcessError:
+        # Fallback for silent / video-only inputs
+        cmd_silent = [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "anullsrc=r=16000:cl=mono",
+            "-t", "1",
+            output_wav
+        ]
+        subprocess.run(cmd_silent, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     return output_wav
 
 def transcribe_audio(audio_path: str, model_size: str = "small.en") -> dict:
