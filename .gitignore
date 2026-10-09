@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv
+ENV/
+env/
+
+# Large model files & temp files
+*.pt
+/tmp/
+
+# Outputs and large video files
+output/
+input/*.mp4
+input/*.mkv
+input/*.mov
+input/*.avi
